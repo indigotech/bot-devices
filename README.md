@@ -11,7 +11,7 @@ Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users' behalf
 - Execute:
 ```
 $ npm install
-$ node index.js
+$ SLACK_TOKEN=<insert_bot_token_here> node index.js
 ```
 
 ## Usage example
