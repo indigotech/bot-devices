@@ -1,0 +1,16 @@
+{
+  "name": "tqt-bot",
+  "version": "1.0.0",
+  "description": "Taqtile tqt project bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Felipe Sabino <felipe@taqtile.com>",
+  "license": "ISC",
+  "dependencies": {
+    "coffee-script": "1.9.3",
+    "rootpath": "^0.1.2",
+    "slack-client": "1.4.1"
+  }
+}
