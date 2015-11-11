@@ -4,6 +4,16 @@ Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users' behalf
 
 (Based on [slack's example](https://github.com/slackhq/node-slack-client/blob/master/examples/simple_reverse.coffee) code)
 
+## Running
+
+- Tested only on node.js `v0.12.0`
+
+- Execute:
+```
+$ npm install
+$ node index.js
+```
+
 ## Usage example
 
 ![Usage example](assets/screenshot.png)
