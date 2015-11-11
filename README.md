@@ -1,6 +1,6 @@
 # TQT bot
 
-Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users behalf.
+Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users' behalf.
 
 (Based on [slack's example](https://github.com/slackhq/node-slack-client/blob/master/examples/simple_reverse.coffee) code)
 
