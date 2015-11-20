@@ -1,5 +1,7 @@
 # TQT bot
 
+[![Build Status](https://travis-ci.org/indigotech/tqt-bot.svg?branch=master)](https://travis-ci.org/indigotech/tqt-bot)
+
 Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users' behalf.
 
 (Based on [slack's example](https://github.com/slackhq/node-slack-client/blob/master/examples/simple_reverse.coffee) code)
