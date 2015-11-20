@@ -1,30 +1,25 @@
-# This is a simple example of how to use the slack-client module in CoffeeScript. It creates a
-# bot that responds to all messages in all channels it is in with a reversed
-# string of the text received.
-#
-# To run, copy your token below, then, from the project root directory:
-#
-# To run the script directly
-#    npm install
-#    node_modules/coffee-script/bin/coffee examples/simple_reverse.coffee
-#
-# If you want to look at / run / modify the compiled javascript
-#    npm install
-#    node_modules/coffee-script/bin/coffee -c examples/simple_reverse.coffee
-#    cd examples
-#    node simple_reverse.js
-#
-
 Slack   = require('slack-client')
-exec    = require('child_process').exec
+
+# Config helpers
+configHelper = require('tq1-helpers').config_helper
+
+# DEPS
+async   = require('async')
+config  = require('../src/config')(configHelper)
+childProcess = require('child_process')
+
+# TQT
+module_tqt = require './tqt'
+tqt = module_tqt async, config, childProcess
+
 
 module.exports = (callback) ->
 
-  token = process.env.SLACK_TOKEN # Add a bot at https://my.slack.com/services/new/bot and copy the token here.
+  config.validate()
+
+  token = config.slackToken
   autoReconnect = true
   autoMark = true
-
-  allowedArgs = ['help', 'version', 'config', 'github', 'google_drive']
 
   slack = new Slack(token, autoReconnect, autoMark)
 
@@ -43,9 +38,9 @@ module.exports = (callback) ->
     console.log 'You are in: ' + channels.join(', ')
     console.log 'As well as: ' + groups.join(', ')
 
-    messages = if unreads is 1 then 'message' else 'messages'
-
-    console.log "You have #{unreads} unread #{messages}"
+    # messages = if unreads is 1 then 'message' else 'messages'
+    #
+    # console.log "You have #{unreads} unread #{messages}"
 
 
   slack.on 'message', (message) ->
@@ -60,31 +55,20 @@ module.exports = (callback) ->
 
     userName = if user?.name? then "@#{user.name}" else "UNKNOWN_USER"
 
-    console.log """
-      Received: #{type} #{channelName} #{userName} #{ts} "#{text}"
-    """
+    # console.log """
+    #   Received: #{type} #{channelName} #{userName} #{ts} "#{text}"
+    # """
 
     # Respond to messages with the reverse of the text received.
-    if type is 'message' and text?.indexOf("tqt") is 0 and channel?
+    if type is 'message' and channel?
 
-      args = text.split(' ')
+      channel.send "Ok, I am working on `$ #{text}`..."
 
-      if args.length < 2
-        channel.send "Missing arguments. Try using 'tqt help'"
-      else if allowedArgs.indexOf(args[1]) < 0
-        channel.send "Argumment not allowed. BOT current only supports the following arguments: `#{allowedArgs.join('`, `')}`"
-      else
-        command = text # ⚠️ ATTENTION!! Needs input sanitation before going to production
-        channel.send "Ok, working on `$ #{command}`..."
-        exec command,(error, stdout, stderr) ->
-          channel.send """
-            $ #{command}
-            ```#{stdout}```
-          """
-          console.log """
-            @#{slack.self.name} responded with "#{stdout}"
-          """
-
+      tqt.execute text, (err, result) ->
+        if err
+          channel.send "Error executing tqt command `$ #{text}`: ```#{err}```"
+        else
+          channel.send "Here is the result for `$ #{text}` \n\n ```#{result}```"
 
   slack.on 'error', (error) ->
     console.error "Error: #{error}"
