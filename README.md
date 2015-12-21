@@ -25,6 +25,12 @@ $ npm install
 $ npm start
 ```
 
+## Testing
+
+```
+$ npm test
+```
+
 ## Usage example
 
 ![Usage example](assets/screenshot.png)
