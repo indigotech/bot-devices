@@ -15,8 +15,6 @@ tqt = module_tqt async, config, childProcess
 
 module.exports = (callback) ->
 
-  config.validate()
-
   token = config.slackToken
   autoReconnect = true
   autoMark = true
