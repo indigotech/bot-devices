@@ -1,6 +1,7 @@
-module.exports = (async, config, childProcess) ->
+module.exports = (async, config) ->
 
-  parseRequest = (args, cb) ->
+
+  parseRequest = (args) ->
     action = args[0]
     if action == 'want' && args[1]?
       code = args[1]
@@ -30,29 +31,42 @@ module.exports = (async, config, childProcess) ->
       if action == 'update'
         params['status'] = args[6]
         return params
-        #Put updated device
+      #Put updated device
       else
         return params
-        #Post created device
+  #Post created device
 
-      # post create/update device with params
-
-  getQueryParams = (args) ->
-    return args.slice(2).join(" ")
+  # post create/update device with params
 
   validate = (text, callback) ->
+    args = text.split()
     return callback()
-
 
 
   executeCommand = (text, callback) ->
     async.waterfall [
       async.apply validate, text
       (cb) ->
-        cb null, text.split(' ') #removes 'tqt' and keep following arguments
+        cb null, text.split(' ')
       (args, cb) ->
-        return cb null, parseRequest(args, cb)
 
+        handler = require('../src/handler')
+        mhandler = handler()
+
+        response = parseRequest(args)
+        
+        mhandler.getdevices (devices) ->
+          console.log devices
+
+        command = args[0]
+
+        if command is 'tem'
+          device = args[1]
+          os = args[2]
+
+          return cb null, response
+
+        return cb null, 'Desculpa, não entendi...'
     ], callback
 
   execute: executeCommand,

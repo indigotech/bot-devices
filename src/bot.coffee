@@ -6,12 +6,14 @@ configHelper = require('tq1-helpers').config_helper
 # DEPS
 async   = require('async')
 config  = require('../src/config')(configHelper)
-childProcess = require('child_process')
-$ = require('jquery')
+
+
+router_module = require('../src/router')
+
 
 # TQT
-module_tqt = require './tqt'
-tqt = module_tqt async, config, childProcess
+awesome_module = require './awesome'
+awesome = awesome_module async, config, router_module
 
 
 module.exports = (callback) ->
@@ -61,14 +63,13 @@ module.exports = (callback) ->
     # Respond to messages with the reverse of the text received.
     if type is 'message' and channel?
 
-      channel.send "Ok, I am working on `$ #{text}`..."
+      # channel.send "Ok, I am working on `$ #{text}`..."
 
-      tqt.execute text, (err, result) ->
+      awesome.execute text, (err, result) ->
         if err
-          channel.send "Error executing tqt command `$ #{text}`: ```#{err}```"
+          channel.send "Error executing command `$ #{text}`: ```#{err}```"
         else
-          channel.send "#{result}"
-#          channel.send "Here is the result for `$ #{text}` \n\n ```#{result}```"
+          channel.send result
 
   slack.on 'error', (error) ->
     console.error "Error: #{error}"
