@@ -78,6 +78,22 @@ module.exports = (async, config) ->
     args = text.split()
     return callback()
 
+  returnDevice = (id, callback) ->
+    request = require('request')
+
+    request 'https://dandpb.fwd.wf/devices/' + id, (error, response, body) ->
+      if (!error && response.statusCode == 200)
+        jsonDevice = JSON.parse(body)
+
+        jsonDevice.status = 'available'
+        jsonDevice.user = ''
+        jsonDevice.date = ''
+
+        request.post 'https://dandpb.fwd.wf/devices', {form:jsonDevice}, (error, response, body) ->
+          console.log 'cheguei aqui' + response.statusCode
+          if (!error && response.statusCode == 201)
+            callback null, "It's back!"
+          else callback error
 
   executeCommand = (text, user, callback) ->
     async.waterfall [
@@ -101,7 +117,14 @@ module.exports = (async, config) ->
         else if action == 'got'
           id = args[1]
           if id != null
-            getDeviceById id, user, cb
+            getDeviceById id, user.name, cb
+            (response, cb) ->
+              return cb null, response
+
+        else if action == 'back'
+          id = args[1]
+          if id != null
+            returnDevice id, cb
             (response, cb) ->
               return cb null, response
     ], callback
