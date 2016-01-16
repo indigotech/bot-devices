@@ -1,4 +1,4 @@
-module.exports = (async, config, childProcess) ->
+module.exports = (async, config) ->
 
   validate = (text, callback) ->
     args = text.split()
@@ -11,6 +11,12 @@ module.exports = (async, config, childProcess) ->
       (cb) ->
         cb null, text.split(' ')
       (args, cb) ->
+
+        handler = require('../src/handler')
+        mhandler = handler()
+        
+        mhandler.getdevices (devices) ->
+          console.log devices
 
         command = args[0]
 

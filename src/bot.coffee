@@ -6,11 +6,11 @@ configHelper = require('tq1-helpers').config_helper
 # DEPS
 async   = require('async')
 config  = require('../src/config')(configHelper)
-childProcess = require('child_process')
+router_module = require('../src/router')
 
 # TQT
 awesome_module = require './awesome'
-awesome = awesome_module async, config, childProcess
+awesome = awesome_module async, config, router_module
 
 
 module.exports = (callback) ->
