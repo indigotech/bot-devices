@@ -1,15 +1,58 @@
 module.exports = (async, config) ->
 
+  router = (params, callback) ->
+    request = require('request')
+    response = ''
 
-  parseRequest = (args) ->
+    if params
+      request 'https://dandpb.fwd.wf/devices?' + params, (error, response, body) ->
+        console.log 'https://dandpb.fwd.wf/devices?' + params
+        if (!error && response.statusCode == 200)
+          console.log body
+          callback body
+
+    else
+      request 'https://dandpb.fwd.wf/devices', (error, response, body) ->
+        if (!error && response.statusCode == 200)
+          callback body
+
+  getAllDevices = (callback) ->
+    router null, (body) ->
+      console.log body
+      callback body
+
+  getDeviceByOs = (os, callback) ->
+    params = 'os=' + os
+
+    router params, (body) ->
+      console.log body
+      callback body
+
+  getDeviceByQ = (query, callback) ->
+    params = 'q=' + query
+
+    router.getdevices params, (body) ->
+      callback body
+
+
+  parseRequest = (args, callback) ->
+    request = require('request')
     action = args[0]
     if action == 'want' && args[1]?
       code = args[1]
       #post device code
 #      response = httpGet(serverURL + args[1])
-    else if action == 'get' && args[1]?
+    else if action == 'get'
       platform = args[1]
-      if platform == 'iphone'
+      if args[1] != null
+        console.log 'aqui3'
+        request 'https://dandpb.fwd.wf/devices', (error, response, body) ->
+          if (!error && response.statusCode == 200)
+            console.log body, args, callback
+            callback getAllDevices(callback)
+#          return JSON.stringify(devices)
+
+      else if platform == 'iphone'
         return args.slice(2).join(" ")
         # query parameters (args.slice(2).join(" "))
       else if platform == 'android'
@@ -49,24 +92,20 @@ module.exports = (async, config) ->
       (cb) ->
         cb null, text.split(' ')
       (args, cb) ->
+        console.log 'aqui'
+        parseRequest args, callback
+      (response, args, cb) ->
+        console.log 'aqui2'
 
-        handler = require('../src/handler')
-        mhandler = handler()
 
-        response = parseRequest(args)
-        
-        mhandler.getdevices (devices) ->
-          console.log devices
+#        response = parseRequest(args)
+#
+#        mhandler.getdevices (devices) ->
+#          console.log devices
+#
+#        command = args[0]
 
-        command = args[0]
-
-        if command is 'tem'
-          device = args[1]
-          os = args[2]
-
-          return cb null, response
-
-        return cb null, 'Desculpa, não entendi...'
+        return cb null, response
     ], callback
 
   execute: executeCommand,
