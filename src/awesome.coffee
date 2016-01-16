@@ -8,7 +8,6 @@ module.exports = (async, config) ->
       request 'https://dandpb.fwd.wf/devices?' + params, (error, response, body) ->
         console.log 'https://dandpb.fwd.wf/devices?' + params
         if (!error && response.statusCode == 200)
-          console.log body
           callback body
 
     else
@@ -31,87 +30,80 @@ module.exports = (async, config) ->
   getDeviceByQ = (query, callback) ->
     params = 'q=' + query
 
-    router.getdevices params, (body) ->
+    router params, (body) ->
       callback body
 
-  createDevice = (device, callback) ->
+  createDevice = (args, callback) ->
     request = require('request')
-    request.post 'https://dandpb.fwd.wf/devices', {form:device}, (error, response, body) ->
+
+    params = {}
+    params['model'] = args[1]
+    params['os'] = args[2]
+    params['version'] = args[3]
+    params['notes'] = args[4]
+    params['owner'] = args[5]
+    params['status'] = 'available'
+    params['date'] = ' '
+    params['user'] = ' '
+
+    request.post 'https://dandpb.fwd.wf/devices', {form:params}, (error, response, body) ->
       console.log 'cheguei aqui' + response.statusCode
       if (!error && response.statusCode == 201)
         console.log 'Looog ' + body
         callback null, body
 
-  parseRequest = (args, callback) ->
+  getDeviceById = (id, name, callback) ->
     request = require('request')
-    action = args[0]
-    console.log 'Action: ' + action
 
-    if action == 'want' && args[1]?
-      console.log 'Action want'
-      code = args[1]
-      #post device code
-#      response = httpGet(serverURL + args[1])
-    else if action == 'get'
-      console.log 'Action get'
-      platform = args[1]
-      if args[1] != null
-        console.log 'aqui3'
-        # request 'https://dandpb.fwd.wf/devices', (error, response, body) ->
-        #   if (!error && response.statusCode == 200)
-        #     console.log body, args, callback
-        #     callback getAllDevices(callback)
-#          return JSON.stringify(devices)
+    request 'https://dandpb.fwd.wf/devices/' + id, (error, response, body) ->
+      if (!error && response.statusCode == 200)
+        gotDevice body, name, callback
 
-      else if platform == 'iphone'
-        return args.slice(2).join(" ")
-        # query parameters (args.slice(2).join(" "))
-      else if platform == 'android'
-        return args.slice(2).join(" ")
-        # query parameters (args.slice(2).join(" "))
-      else if platform  == 'wp'
-        return args.slice(2).join(" ")
-        # query parameters (args.slice(2).join(" "))
-    else if action == 'create' || action == 'update'
-      console.log 'Action create'
+  gotDevice = (device, name, callback) ->
+    request = require('request')
 
-      params = {}
-      params['model'] = args[1]
-      params['os'] = args[2]
-      params['version'] = args[3]
-      params['notes'] = args[4]
-      params['owner'] = args[5]
-      params['status'] = 'available'
-      params['date'] = ' '
-      params['user'] = ' '
-      if action == 'update'
-        params['status'] = args[6]
-        return params
-      #Put updated device
-      else
-        callback null, params
-        # return params
-  #Post created device
+    jsonDevice = JSON.parse(device)
 
-  # post create/update device with params
+    jsonDevice.status = 'unavailable'
+    jsonDevice.user = name
+    jsonDevice.date = new Date()
+
+    request.post 'https://dandpb.fwd.wf/devices', {form:jsonDevice}, (error, response, body) ->
+      console.log 'cheguei aqui' + response.statusCode
+      if (!error && response.statusCode == 201)
+        callback null, "It's yours!"
+      else callback error
 
   validate = (text, callback) ->
     args = text.split()
     return callback()
 
 
-  executeCommand = (text, callback) ->
+  executeCommand = (text, user, callback) ->
     async.waterfall [
       async.apply validate, text
       (cb) ->
         cb null, text.split(' ')
       (args, cb) ->
-        console.log 'aqui'
-        parseRequest args, cb
-      (device, cb) ->
-        createDevice device, cb
-      (response, cb) ->
-        return cb null, response
+        action = args[0]
+        if action == 'create'
+          createDevice args, cb
+          (response, cb) ->
+            return cb null, response
+
+        else if action == 'get'
+          platform = args[1]
+          if platform != null
+            getDeviceByQ platform, cb
+            (response, cb) ->
+              return cb null, response
+
+        else if action == 'got'
+          id = args[1]
+          if id != null
+            getDeviceById id, user, cb
+            (response, cb) ->
+              return cb null, response
     ], callback
 
   execute: executeCommand,

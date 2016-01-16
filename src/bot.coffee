@@ -65,7 +65,7 @@ module.exports = (callback) ->
 
       channel.send "Ok"
 
-      awesome.execute text, (err, result) ->
+      awesome.execute text, user, (err, result) ->
         if err
           channel.send "Error executing command `$ #{text}`: ```#{err}```"
         else
