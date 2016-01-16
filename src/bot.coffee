@@ -63,11 +63,13 @@ module.exports = (callback) ->
     # Respond to messages with the reverse of the text received.
     if type is 'message' and channel?
 
-      channel.send "Ok"
+      channel.send "Got it! Just a sec..."
 
       awesome.execute text, user, (err, result) ->
-        if err
-          channel.send "Error executing command `$ #{text}`: ```#{err}```"
+        if err == 'error'
+          channel.send "Something went wrong! :scream:"
+        else if err
+          channel.send err
         else
           channel.send result
 
