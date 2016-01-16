@@ -7,6 +7,7 @@ configHelper = require('tq1-helpers').config_helper
 async   = require('async')
 config  = require('../src/config')(configHelper)
 childProcess = require('child_process')
+$ = require('jquery')
 
 # TQT
 module_tqt = require './tqt'
@@ -66,7 +67,8 @@ module.exports = (callback) ->
         if err
           channel.send "Error executing tqt command `$ #{text}`: ```#{err}```"
         else
-          channel.send "Here is the result for `$ #{text}` \n\n ```#{result}```"
+          channel.send "#{result}"
+#          channel.send "Here is the result for `$ #{text}` \n\n ```#{result}```"
 
   slack.on 'error', (error) ->
     console.error "Error: #{error}"
