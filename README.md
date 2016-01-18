@@ -30,7 +30,3 @@ $ npm start
 $ npm test
 ```
 
-## Usage example
-
-![Usage example](assets/screenshot.png)
-
