@@ -1,4 +1,4 @@
-# TQT bot
+# Awesome Bot
 
 [![Build Status](https://travis-ci.org/indigotech/tqt-bot.svg?branch=master)](https://travis-ci.org/indigotech/tqt-bot)
 
@@ -10,7 +10,6 @@ Bot to access [tqt](https://github.com/indigotech/tqt) remotely on users' behalf
 
 This bot runs using [node-foreman](https://github.com/strongloop/node-foreman), so to set up you local environment variables, create .env file with the following values
 
-- `TQT_PATH`: Absolute path to `tqt` bin on machine running the bot. Default: '/bin/local/tqt'
 - `SLACK_TOKEN`: Token to be used to connect to Slack. Check https://my.slack.com/services/new/bot to create/get one.
 
 _tip:_ You can use [`.env.example`](.env.example) file as a template for the config
@@ -35,9 +34,3 @@ $ npm test
 
 ![Usage example](assets/screenshot.png)
 
-## Pending
-
-- [ ] Decide how/where to host it (machine needs to have TQT CLI installed and properly configured)
-- [ ] Create github user to exec all github related commands
-- [ ] Review commands that are allowed and make sense for the bot
-- [x] ~~local tests showed `exec` to be really slow to respond, needs improvement~~ Using `childProcess.execFile` to avoid command injection
