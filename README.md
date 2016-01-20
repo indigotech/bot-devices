@@ -1,7 +1,5 @@
 # Awesome Bot
 
-[![Build Status](https://travis-ci.org/indigotech/tqt-bot.svg?branch=master)](https://travis-ci.org/indigotech/tqt-bot)
-
 Bot to manage devices through Slack's chat interface.
 
 (Based on [slack's example](https://github.com/slackhq/node-slack-client/blob/master/examples/simple_reverse.coffee) code)
@@ -29,4 +27,10 @@ $ npm start
 ```
 $ npm test
 ```
+## Pending
+- [ ] Change SLACK TOKEN to the Taqtile's Slack Token
+- [ ] Decide how/where to host it
+- [ ] Create a BACKEND application with the same fuction from jsonServer(CRUD e filter)
+- [ ] Create a DB using the same struture from db.json
+- [ ] import the data from db.json
 
