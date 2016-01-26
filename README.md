@@ -2,7 +2,7 @@
 
 Bot to manage devices through Slack's chat interface.
 
-(Based on [slack's example](https://github.com/slackhq/node-slack-client/blob/master/examples/simple_reverse.coffee) code)
+Original source at [guilhermemamprin/awesome-bot](https://github.com/guilhermemamprin/awesome-bot), project was develop for Taqtile's Hackathon '16
 
 ## Configure
 
@@ -29,8 +29,7 @@ $ npm test
 ```
 ## Pending
 - [ ] Change SLACK TOKEN to the Taqtile's Slack Token
-- [ ] Decide how/where to host it
-- [ ] Create a BACKEND application with the same fuction from jsonServer(CRUD e filter)
-- [ ] Create a DB using the same struture from db.json
+- [ ] Decide how/where to host it - Heroku?
+- [ ] Create a BACKEND application with the same function from jsonServer - Use Parser.com?
+- [ ] Create a DB using the same struture from db.json - Use Parser.com?
 - [ ] import the data from db.json
-
