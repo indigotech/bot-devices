@@ -1,9 +1,9 @@
 module.exports = (async, config) ->
 
   devicesEndpoint = config.devicesEndpoint
+  request = require('request')
 
   getAllDevices = (callback) ->
-    request = require('request')
     response = ''
     request devicesEndpoint, (error, response, body) ->
       if (!error && response.statusCode == 200 && body)
@@ -29,7 +29,6 @@ module.exports = (async, config) ->
 
   getDeviceByOs = (os, callback) ->
     params = 'os=' + os
-    request = require('request')
     response = ''
 
     router params, (body) ->
@@ -38,7 +37,6 @@ module.exports = (async, config) ->
 
   getDeviceByQ = (query, callback) ->
     params = 'q=' + query
-    request = require('request')
     response = ''
     path = devicesEndpoint + '?' + params
 
@@ -66,8 +64,6 @@ module.exports = (async, config) ->
       else callback 'error'
 
   createDevice = (args, callback) ->
-    request = require('request')
-
     params = {}
     params['model'] = args[1]
     params['os'] = args[2]
@@ -84,41 +80,52 @@ module.exports = (async, config) ->
         console.log 'Looog ' + body
         callback null, body
 
-  getDeviceById = (id, name, callback) ->
-    request = require('request')
+  getDeviceById = (id, callback) ->
     path = devicesEndpoint + '/' + id
 
     request path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         jsonDevice = JSON.parse(body)
+
         if jsonDevice.length == 0
           callback "Oops, there isn't such a device"
-        else if jsonDevice.status == 'unavailable' && jsonDevice.user == name
-          callback "It's already with you... o.O"
-        else if jsonDevice.status == 'unavailable'
-          callback "Oops, someone else has it. Try talking with " + jsonDevice.user
-        gotDevice body, name, callback
+        else
+          callback null, jsonDevice
+      else
+        callback "error"
 
-  gotDevice = (device, name, callback) ->
-    request = require('request')
 
-    jsonDevice = JSON.parse(device)
+  gotDevice = (id, name, slackCallback) ->
+    async.waterfall [
+      (cb) -> 
+        getDeviceById id, (error, device) ->
+          if error
+            slackCallback error
+          else if device.status == 'unavailable' && device.user == name
+            slackCallback "It's already with you... o.O"
+          else if device.status == 'unavailable'
+            slackCallback "Oops, someone else has it. Try talking with " + device.user
 
-    jsonDevice.status = 'unavailable'
-    jsonDevice.user = name
-    jsonDevice.date = new Date()
+          else
+            device.status = 'unavailable'
+            device.user = name
+            device.date = new Date()
 
-    request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
-      console.log 'cheguei aqui' + response.statusCode
-      if (!error && response.statusCode == 201)
-        callback null, "It's yours!"
-      else callback 'error'
+          cb null, device
 
-  validate = (text, callback) ->
-    return callback()
+      (jsonDevice, cb) ->
+        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
+          console.log 'cheguei aqui' + response.statusCode
+          if (!error && response.statusCode == 201)
+            slackCallback null, "It's yours!"
+          else slackCallback 'error'
+
+          cb null
+
+    ], slackCallback
+
 
   returnDevice = (id, callback) ->
-    request = require('request')
     path = devicesEndpoint + '/' + id
 
     request path, (error, response, body) ->
@@ -136,16 +143,18 @@ module.exports = (async, config) ->
           else callback 'error'
 
   removeDevice = (args, callback) ->
-    request = require('request')
     path = devicesEndpoint+ '/' + args[1]
 
     request.del path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         callback null, "Device was removed"
 
+  updateDevice = (args, callback) ->
+    path = devicesEndpoint+ '/' + args[1]
+
+
   executeCommand = (text, user, callback) ->
     async.waterfall [
-      async.apply validate, text
       (cb) ->
         if text == null || text == 'undefined' || text == undefined
           console.log text
@@ -178,7 +187,7 @@ module.exports = (async, config) ->
         else if action == 'got'
           id = args[1]
           if id != null
-            getDeviceById id, user.name, cb
+            gotDevice id, user.name, cb
             (response, cb) ->
               return cb null, response
 
@@ -198,9 +207,16 @@ module.exports = (async, config) ->
           (response, cb) ->
             return cb null, response
 
+        else if action == 'update'
+          id = args[1]
+          if id != null
+            getDeviceById id, user.name, cb
+            (response, cb) ->
+              return cb null, response
+
         else
           text = "Whaaat? \n\n" + helpText
           return cb null, text
     ], callback
 
-  execute: executeCommand,
+  execute: executeCommand
