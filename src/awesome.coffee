@@ -124,6 +124,32 @@ module.exports = (async, config) ->
 
     ], slackCallback
 
+  updateDevice = (id, field, newValue, slackCallback) ->
+    async.waterfall [
+      (cb) -> 
+        getDeviceById id, (error, device) ->
+          console.log 'id: ' + id
+          if error
+            slackCallback error
+          else if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
+            console.log field
+            device[field] = newValue
+          else
+            slackCallback "Oops, not a valid field."
+
+          cb null, device
+
+      (jsonDevice, cb) ->
+        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
+          console.log 'cheguei aqui' + response.statusCode
+          if (!error && response.statusCode == 201)
+            slackCallback null, "Done!\n\n" + body
+          else slackCallback 'error'
+
+          cb null
+
+    ], slackCallback
+
 
   returnDevice = (id, callback) ->
     path = devicesEndpoint + '/' + id
@@ -148,10 +174,6 @@ module.exports = (async, config) ->
     request.del path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         callback null, "Device was removed"
-
-  updateDevice = (args, callback) ->
-    path = devicesEndpoint+ '/' + args[1]
-
 
   executeCommand = (text, user, callback) ->
     async.waterfall [
@@ -210,7 +232,8 @@ module.exports = (async, config) ->
         else if action == 'update'
           id = args[1]
           if id != null
-            getDeviceById id, user.name, cb
+            console.log args
+            updateDevice id, args[2], args[3], cb
             (response, cb) ->
               return cb null, response
 
