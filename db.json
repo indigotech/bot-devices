@@ -73,9 +73,9 @@
       "version": "4.4.2",
       "notes": "8GB Black",
       "owner": "taqtile",
-      "status": "available",
-      "date": "15/01/2016",
-      "user": ""
+      "status": "unavailable",
+      "date": "2016-05-21T18:15:46.548Z",
+      "user": "leticia"
     },
     {
       "id": 8,
@@ -96,7 +96,7 @@
       "notes": "16GB Black",
       "owner": "taqtile",
       "status": "available",
-      "date": "15/01/2016",
+      "date": "",
       "user": ""
     },
     {
@@ -428,17 +428,6 @@
       "status": "available",
       "date": "15/01/2016",
       "user": ""
-    },
-    {
-      "model": "BeautyfulPhone",
-      "os": "ios",
-      "version": 100,
-      "notes": "puriri",
-      "owner": "leticia",
-      "status": "available",
-      "date": " ",
-      "user": " ",
-      "id": 41
     }
   ]
 }

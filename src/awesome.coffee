@@ -1,6 +1,6 @@
 module.exports = (async, config) ->
 
-  devicesEndpoint = '' + config.devicesEndpoint
+  devicesEndpoint = config.devicesEndpoint
 
   getAllDevices = (callback) ->
     request = require('request')
@@ -86,8 +86,9 @@ module.exports = (async, config) ->
 
   getDeviceById = (id, name, callback) ->
     request = require('request')
+    path = devicesEndpoint + '/' + id
 
-    request devicesEndpoint + '/' + id, (error, response, body) ->
+    request path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         jsonDevice = JSON.parse(body)
         if jsonDevice.length == 0
@@ -118,8 +119,9 @@ module.exports = (async, config) ->
 
   returnDevice = (id, callback) ->
     request = require('request')
+    path = devicesEndpoint + '/' + id
 
-    request devicesEndpoint + '/' + id, (error, response, body) ->
+    request path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         jsonDevice = JSON.parse(body)
 
@@ -135,7 +137,9 @@ module.exports = (async, config) ->
 
   removeDevice = (args, callback) ->
     request = require('request')
-    request.del devicesEndpoint+ '/' + args[1], (error, response, body) ->
+    path = devicesEndpoint+ '/' + args[1]
+
+    request.del path, (error, response, body) ->
       if (!error && response.statusCode == 200)
         callback null, "Device was removed"
 
@@ -148,6 +152,8 @@ module.exports = (async, config) ->
           cb 'error'
         else cb null, text.split(' ')
       (args, cb) ->
+        helpText = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n\nYou can type \`want\` followed by any term of what you want to find (e.g., \*want iPhone\* or \*want iOS\*). \n\nOr, you can just ask for the availability of all devices by typing \`want all\`. When you take a device, \nremember to tell others by typing \`got\` followed by its id. When you return a device, \ntell your bros too: type \`back\` followed by its id.\n\nYou can also register a new device or delete an existing one by typing \`register\` or \`delete\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
+
         action = args[0]
         if action == 'register'
           createDevice args, cb
@@ -184,7 +190,7 @@ module.exports = (async, config) ->
               return cb null, response
 
         else if action == 'help'
-         text = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \nYou can type \"want\" followed by any term of what you want to find (e.g., \"want iPhone\" or \"want iOS\"). \nOr, you can just ask for the availability of all devices by typing \"want all\". When you take a device, \nremember to tell others by typing \"got\" followed by its information. When you return a device, \ntell your bros too: type \"back\" followed by its information.\nYou can also register a new device or delete an existing one by typing \"register\" or \"delete\", followed by its full information. Remember, bro, You will need: \"id\" (e.g., 38), \"model\" (e.g., Blackberry Curve), \"os\" (e.g., blackberry), \"version\" (e.g., 7.0.0 Bundle 2055), \"notes\" (e.g., black),\"owner\" (e.g., your name)."
+         text = helpText
          return cb null, text
 
         else if action == 'delete'
@@ -193,7 +199,7 @@ module.exports = (async, config) ->
             return cb null, response
 
         else
-          text = "Whaaat? \nYo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \nYou can type \"want\" followed by any term of what you want to find (e.g., \"want iPhone\" or \"want iOS\"). \nOr, you can just ask for the availability of all devices by typing \"want all\". When you take a device, \nremember to tell others by typing \"got\" followed by its information. When you return a device, \ntell your bros too: type \"back\" followed by its information.\nYou can also register a new device or delete an existing one by typing \"register\" or \"delete\", followed by its full information. Remember, bro, You will need: \"id\" (e.g., 38), \"model\" (e.g., Blackberry Curve), \"os\" (e.g., blackberry), \"version\" (e.g., 7.0.0 Bundle 2055), \"notes\" (e.g., black),\"owner\" (e.g., your name)."
+          text = "Whaaat? \n\n" + helpText
           return cb null, text
     ], callback
 
