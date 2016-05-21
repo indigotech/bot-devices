@@ -1,9 +1,11 @@
 module.exports = (async, config) ->
 
+  devicesEndpoint = '' + config.devicesEndpoint
+
   getAllDevices = (callback) ->
     request = require('request')
     response = ''
-    request 'https://dandpb.fwd.wf/devices', (error, response, body) ->
+    request devicesEndpoint, (error, response, body) ->
       if (!error && response.statusCode == 200 && body)
         jsonDevice = JSON.parse(body)
         pretty = ''
@@ -38,9 +40,10 @@ module.exports = (async, config) ->
     params = 'q=' + query
     request = require('request')
     response = ''
+    path = devicesEndpoint + '?' + params
 
-    request 'https://dandpb.fwd.wf/devices?' + params, (error, response, body) ->
-      console.log 'https://dandpb.fwd.wf/devices?' + params
+    request path, (error, response, body) ->
+      console.log devicesEndpoint + '?' + params
       if (!error && response.statusCode == 200 && body)
         jsonDevice = JSON.parse(body)
         pretty = ''
@@ -75,7 +78,7 @@ module.exports = (async, config) ->
     params['date'] = ' '
     params['user'] = ' '
 
-    request.post 'https://dandpb.fwd.wf/devices', {form:params}, (error, response, body) ->
+    request.post devicesEndpoint, {form:params}, (error, response, body) ->
       console.log 'cheguei aqui' + response.statusCode
       if (!error && response.statusCode == 201)
         console.log 'Looog ' + body
@@ -84,7 +87,7 @@ module.exports = (async, config) ->
   getDeviceById = (id, name, callback) ->
     request = require('request')
 
-    request 'https://dandpb.fwd.wf/devices/' + id, (error, response, body) ->
+    request devicesEndpoint + '/' + id, (error, response, body) ->
       if (!error && response.statusCode == 200)
         jsonDevice = JSON.parse(body)
         if jsonDevice.length == 0
@@ -104,7 +107,7 @@ module.exports = (async, config) ->
     jsonDevice.user = name
     jsonDevice.date = new Date()
 
-    request.post 'https://dandpb.fwd.wf/devices', {form:jsonDevice}, (error, response, body) ->
+    request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
       console.log 'cheguei aqui' + response.statusCode
       if (!error && response.statusCode == 201)
         callback null, "It's yours!"
@@ -116,7 +119,7 @@ module.exports = (async, config) ->
   returnDevice = (id, callback) ->
     request = require('request')
 
-    request 'https://dandpb.fwd.wf/devices/' + id, (error, response, body) ->
+    request devicesEndpoint + '/' + id, (error, response, body) ->
       if (!error && response.statusCode == 200)
         jsonDevice = JSON.parse(body)
 
@@ -124,7 +127,7 @@ module.exports = (async, config) ->
         jsonDevice.user = ''
         jsonDevice.date = ''
 
-        request.post 'https://dandpb.fwd.wf/devices', {form:jsonDevice}, (error, response, body) ->
+        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
           console.log 'cheguei aqui' + response.statusCode
           if (!error && response.statusCode == 201)
             callback null, "It's back!"
@@ -132,7 +135,7 @@ module.exports = (async, config) ->
 
   removeDevice = (args, callback) ->
     request = require('request')
-    request.del 'https://dandpb.fwd.wf/devices/' + args[1], (error, response, body) ->
+    request.del devicesEndpoint+ '/' + args[1], (error, response, body) ->
       if (!error && response.statusCode == 200)
         callback null, "Device was removed"
 
