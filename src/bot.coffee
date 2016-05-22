@@ -1,28 +1,18 @@
 Slack   = require('slack-client')
 
-# Config helpers
-configHelper = require('tq1-helpers').config_helper
-
 # DEPS
+_ = require('lodash')
 async   = require('async')
-config  = require('../src/config')(configHelper)
-
-
-router_module = require('../src/router')
-
+request = require('request')
+config  = require('src/config')
 
 # TQT
-awesome_module = require './awesome'
-awesome = awesome_module async, config, router_module
-
+devices = require('src/devices')(request, config)
+awesome = require('src/awesome')(async, _, devices)
 
 module.exports = (callback) ->
 
-  token = config.slackToken
-  autoReconnect = true
-  autoMark = true
-
-  slack = new Slack(token, autoReconnect, autoMark)
+  slack = new Slack(config.slack.token, config.slack.autoReconnect, config.slack.autoMark)
 
   slack.on 'open', ->
     channels = []
@@ -74,7 +64,7 @@ module.exports = (callback) ->
           channel.send result
 
   slack.on 'error', (error) ->
-    console.error "Error: #{error}"
+    console.error "Error: #{JSON.stringify(error)}"
 
 
   slack.login()

@@ -1,245 +1,187 @@
-module.exports = (async, config) ->
-
-  devicesEndpoint = config.devicesEndpoint
-  request = require('request')
+module.exports = (async, _, devices) ->
 
   getAllDevices = (callback) ->
-    response = ''
-    request devicesEndpoint, (error, response, body) ->
-      if (!error && response.statusCode == 200 && body)
-        jsonDevice = JSON.parse(body)
-        pretty = ''
-        for device in jsonDevice
-          if device && device.model && device.version && device.status
-            
-            if device.status == 'unavailable'
-              pretty = pretty + ':red_circle: '
-            else
-              pretty = pretty + ':large_blue_circle: '
-            pretty = pretty + device.model + ' ' + device.version
-            if device.status == 'unavailable'
-              pretty = pretty + ' with ' + device.user
-            if device.owner != 'taqtile'
-              pretty = pretty + ' owned by ' + device.owner
-            pretty = pretty + '\n'
-
-
-        callback null, pretty
-      else callback 'error'
-
-  getDeviceByOs = (os, callback) ->
-    params = 'os=' + os
-    response = ''
-
-    router params, (body) ->
-      console.log body
-      callback body
+    devices.getAll (error, deviceList) ->
+      if error
+        callback 'error'
+      else
+        prettyList = _.map deviceList, (device) -> device.prettyPrint()
+        callback null, prettyList.join()
 
   getDeviceByQ = (query, callback) ->
-    params = 'q=' + query
-    response = ''
-    path = devicesEndpoint + '?' + params
-
-    request path, (error, response, body) ->
-      console.log devicesEndpoint + '?' + params
-      if (!error && response.statusCode == 200 && body)
-        jsonDevice = JSON.parse(body)
-        pretty = ''
-        for device in jsonDevice
-          if device && device.model && device.version && device.status
-            
-            if device.status == 'unavailable'
-              pretty = pretty + ':red_circle: '
-            else
-              pretty = pretty + ':large_blue_circle: '
-            pretty = pretty + device.model + ' ' + device.version
-            if device.status == 'unavailable'
-              pretty = pretty + ' with ' + device.user
-            if device.owner != 'taqtile'
-              pretty = pretty + ' owned by ' + device.owner
-            pretty = pretty + '\n'
-
-
-        callback null, pretty
-      else callback 'error'
+    devices.search query, (error, deviceList) ->
+      if error
+        callback 'error'
+      else
+        prettyList = _.map deviceList, (device) -> device.prettyPrint()
+        callback null, prettyList.join()
 
   createDevice = (args, callback) ->
-    params = {}
-    params['model'] = args[1]
-    params['os'] = args[2]
-    params['version'] = args[3]
-    params['notes'] = args[4]
-    params['owner'] = args[5]
-    params['status'] = 'available'
-    params['date'] = ' '
-    params['user'] = ' '
-
-    request.post devicesEndpoint, {form:params}, (error, response, body) ->
-      console.log 'cheguei aqui' + response.statusCode
-      if (!error && response.statusCode == 201)
-        console.log 'Looog ' + body
-        callback null, body
+    device =
+      model: args[1]
+      os: args[2]
+      version: args[3]
+      notes: args[4]
+      owner: args[5]
+      status: 'available'
+      date: null
+      user: null
+    
+    devices.create device, (error, response) ->
+      if error 
+        callback 'error'
+      else
+        callback null, response
 
   getDeviceById = (id, callback) ->
-    path = devicesEndpoint + '/' + id
-
-    request path, (error, response, body) ->
-      if (!error && response.statusCode == 200)
-        jsonDevice = JSON.parse(body)
-
-        if jsonDevice.length == 0
-          callback "Oops, there isn't such a device"
-        else
-          callback null, jsonDevice
+    devices.getById id, (error, device) ->
+      if error
+        callback "Oops, there isn't such a device"
       else
-        callback "error"
+        callback null, device
 
-
-  gotDevice = (id, name, slackCallback) ->
+  gotDevice = (id, name, callback) ->
     async.waterfall [
       (cb) -> 
         getDeviceById id, (error, device) ->
           if error
-            slackCallback error
-          else if device.status == 'unavailable' && device.user == name
-            slackCallback "It's already with you... o.O"
-          else if device.status == 'unavailable'
-            slackCallback "Oops, someone else has it. Try talking with " + device.user
-
+            cb "Oops, there isn't such a device"
+          else if device.isUnavailable()
+            if device.hasSameUser(name)
+              cb "It's already with you... o.O"
+            else
+              cb "Oops, someone else has it. Try talking with #{device.user}"
           else
             device.status = 'unavailable'
             device.user = name
             device.date = new Date()
 
-          cb null, device
+            cb null, device
 
-      (jsonDevice, cb) ->
-        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
-          console.log 'cheguei aqui' + response.statusCode
-          if (!error && response.statusCode == 201)
-            slackCallback null, "It's yours!"
-          else slackCallback 'error'
+      (device, cb) ->
+        devices.update id, device, (error, response) ->
+          if error
+            cb 'error'
+          else
+            cb null, "It's yours!"
+    ], callback
 
-          cb null
-
-    ], slackCallback
-
-  updateDevice = (id, field, newValue, slackCallback) ->
+  updateDevice = (id, field, newValue, callback) ->
     async.waterfall [
       (cb) -> 
         getDeviceById id, (error, device) ->
-          console.log 'id: ' + id
           if error
-            slackCallback error
-          else if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
-            console.log field
-            device[field] = newValue
+            cb error
+          else if _.has device, field
+            _.set device, field, newValue
+            
+            cb null, device
           else
-            slackCallback "Oops, not a valid field."
+            cb 'Oops, not a valid field.'
 
-          cb null, device
-
-      (jsonDevice, cb) ->
-        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
-          console.log 'cheguei aqui' + response.statusCode
-          if (!error && response.statusCode == 201)
-            slackCallback null, "Done!\n\n" + body
-          else slackCallback 'error'
-
-          cb null
-
-    ], slackCallback
-
+      (device, cb) ->
+        devices.update id, device, (error, response) ->
+          if error
+            cb 'error'
+          else
+            cb null
+    ], (error) ->
+      if error
+        callback error
+      else
+        callback null, "Done!\n\n#{body}"
 
   returnDevice = (id, callback) ->
-    path = devicesEndpoint + '/' + id
+    async.waterfall [
+      (cb) ->
+        getDeviceById id, (error, device) ->
+          if error
+            cb "Oops, there isn't such a device"
+          else
+            device.status = 'available'
+            device.user = null
+            device.date = null
 
-    request path, (error, response, body) ->
-      if (!error && response.statusCode == 200)
-        jsonDevice = JSON.parse(body)
+            cb null, device
 
-        jsonDevice.status = 'available'
-        jsonDevice.user = ''
-        jsonDevice.date = ''
+      (device, cb) ->
+        devices.update id, device, (error, response) ->
+          if error
+            cb 'error'
+          else
+            cb null
+    ], (error) ->
+      if error
+        callback error
+      else
+        callback null, "It's back"
 
-        request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
-          console.log 'cheguei aqui' + response.statusCode
-          if (!error && response.statusCode == 201)
-            callback null, "It's back!"
-          else callback 'error'
-
-  removeDevice = (args, callback) ->
-    path = devicesEndpoint+ '/' + args[1]
-
-    request.del path, (error, response, body) ->
-      if (!error && response.statusCode == 200)
-        callback null, "Device was removed"
+  removeDevice = (id, callback) ->
+    devices.remove id, (error) ->
+      if error
+        callback 'error'
+      else
+        callback null, 'Device was removed'
 
   executeCommand = (text, user, callback) ->
     async.waterfall [
       (cb) ->
-        if text == null || text == 'undefined' || text == undefined
+        if !text || text == 'undefined'
           console.log text
           cb 'error'
-        else cb null, text.split(' ')
+        else
+          cb null, text.split(' ')
+
       (args, cb) ->
-        helpText = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n\nYou can type \`want\` followed by any term of what you want to find (e.g., \*want iPhone\* or \*want iOS\*). \n\nOr, you can just ask for the availability of all devices by typing \`want all\`. When you take a device, \nremember to tell others by typing \`got\` followed by its id. When you return a device, \ntell your bros too: type \`back\` followed by its id.\n\nYou can also register a new device or delete an existing one by typing \`register\` or \`delete\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
+        helpText = [
+          "Yo #{user.name}! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White.\n"
+          "You can type \`want\` followed by any term of what you want to find (e.g., \*want iPhone\* or \*want iOS\*)."
+          "Or, you can just ask for the availability of all devices by typing \`want all\`. When you take a device,"
+          "remember to tell others by typing \`got\` followed by its id. When you return a device,"
+          "tell your bros too: type \`back\` followed by its id.\n"
+          "You can also register a new device or delete an existing one by typing \`register\` or \`delete\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
+        ].join '\n'
 
         action = args[0]
+
         if action == 'register'
           createDevice args, cb
-          (response, cb) ->
-            return cb null, response
 
         else if action == 'want'
           platform = args[1]
-          if platform == 'all'
+
+          if platform == 'all' || !platform || platform == 'undefined'
             getAllDevices cb
-            (response, cb) ->
-              return cb null, response
-          if platform != null && platform != 'undefined' && platform != undefined
-            getDeviceByQ platform, cb
-            (response, cb) ->
-              return cb null, response
           else
-            getAllDevices cb
-            (response, cb) ->
-              return cb null, response
+            getDeviceByQ platform, cb
 
         else if action == 'got'
           id = args[1]
           if id != null
             gotDevice id, user.name, cb
-            (response, cb) ->
-              return cb null, response
 
         else if action == 'back'
           id = args[1]
           if id != null
             returnDevice id, cb
-            (response, cb) ->
-              return cb null, response
 
         else if action == 'help'
          text = helpText
-         return cb null, text
+         cb null, text
 
         else if action == 'delete'
-          removeDevice args, cb
-          (response, cb) ->
-            return cb null, response
+          id = args[1]
+          if id
+            removeDevice args, cb
 
         else if action == 'update'
           id = args[1]
           if id != null
-            console.log args
             updateDevice id, args[2], args[3], cb
-            (response, cb) ->
-              return cb null, response
 
         else
-          text = "Whaaat? \n\n" + helpText
-          return cb null, text
+          cb null, "Whaaat? \n\n#{helpText}"
+
     ], callback
 
   execute: executeCommand
