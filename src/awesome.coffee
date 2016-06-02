@@ -35,7 +35,7 @@ module.exports = (async, config) ->
     request path, (error, response, body) ->
       console.log devicesEndpoint + '?' + params
       if (!error && response.statusCode == 200 && body)
-        jsonDevice = JSON.parse(body)
+        jsonDevice = JSON.parse(body).data
         pretty = ''
         for device in jsonDevice
           if device && device.model && device.version && device.status
@@ -68,7 +68,7 @@ module.exports = (async, config) ->
 
     request.post devicesEndpoint, {form:params}, (error, response, body) ->
       console.log 'cheguei aqui' + response.statusCode
-      if (!error && response.statusCode == 201)
+      if (!error && response.statusCode == 200)
         console.log 'Looog ' + body
         callback null, body
 
@@ -77,7 +77,7 @@ module.exports = (async, config) ->
 
     request path, (error, response, body) ->
       if (!error && response.statusCode == 200)
-        jsonDevice = JSON.parse(body)
+        jsonDevice = JSON.parse(body).data
 
         if jsonDevice.length == 0
           callback "Oops, there isn't such a device"
@@ -108,7 +108,7 @@ module.exports = (async, config) ->
       (jsonDevice, cb) ->
         request.post devicesEndpoint, {form:jsonDevice}, (error, response, body) ->
           console.log 'cheguei aqui' + response.statusCode
-          if (!error && response.statusCode == 201)
+          if (!error && response.statusCode == 200)
             slackCallback null, "It's yours!"
           else slackCallback 'error'
 
@@ -148,7 +148,7 @@ module.exports = (async, config) ->
 
     request path, (error, response, body) ->
       if (!error && response.statusCode == 200)
-        jsonDevice = JSON.parse(body)
+        jsonDevice = JSON.parse(body).data
 
         jsonDevice.status = 'available'
         jsonDevice.user = ''
