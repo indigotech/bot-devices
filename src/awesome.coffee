@@ -7,7 +7,7 @@ module.exports = (async, config) ->
     response = ''
     request devicesEndpoint, (error, response, body) ->
       if (!error && response.statusCode == 200 && body)
-        jsonDevice = JSON.parse(body)
+        jsonDevice = JSON.parse(body).data
         pretty = ''
         for device in jsonDevice
           if device && device.model && device.version && device.status
@@ -26,14 +26,6 @@ module.exports = (async, config) ->
 
         callback null, pretty
       else callback 'error'
-
-  getDeviceByOs = (os, callback) ->
-    params = 'os=' + os
-    response = ''
-
-    router params, (body) ->
-      console.log body
-      callback body
 
   getDeviceByQ = (query, callback) ->
     params = 'q=' + query
