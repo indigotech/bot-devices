@@ -27,6 +27,7 @@ awesome = awesome_module async, router_module
 
 module.exports = (robot) ->
   robot.respond /.*-device.*\b/i, (msg) ->
+    console.log msg
     awesome.execute msg.message.text, msg.user, (err, result) ->
       if err == 'error'
         msg.send "Something went wrong! :scream:"
