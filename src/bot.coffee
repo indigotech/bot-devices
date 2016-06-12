@@ -13,19 +13,16 @@
 #   Taqtile
 
 # Config helpers
-configHelper = require('tq1-helpers').config_helper
 
 # DEPS
 async   = require('async')
-config  = require('../src/config')(configHelper)
-
 
 router_module = require('../src/router')
 
 
 # TQT
 awesome_module = require './awesome'
-awesome = awesome_module async, config, router_module
+awesome = awesome_module async, router_module
 
 
 module.exports = (robot) ->
