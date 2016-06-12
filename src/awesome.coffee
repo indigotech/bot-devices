@@ -1,6 +1,6 @@
 module.exports = (async) ->
 
-  devicesEndpoint = process.env.SERVER_URL + "/v1/devices"
+  devicesEndpoint = process.env.DEVICE_SERVER_URL
   request = require('request')
 
   getAllDevices = (callback) ->
