@@ -1,8 +1,8 @@
 {
-  "name": "tqt-bot",
+  "name": "hubot-device-manager",
   "version": "1.0.0",
-  "description": "Taqtile tqt project bot",
-  "main": "index.js",
+  "description": "Taqtile device bot project",
+  "main": "index.coffee",
   "scripts": {
     "test": "gulp test",
     "start": "nf start"
@@ -15,7 +15,6 @@
     "colors": "1.1.2",
     "jquery": "^2.2.0",
     "rootpath": "^0.1.2",
-    "slack-client": "1.4.1",
     "async": "1.5.0",
     "tq1-helpers": "git+https://github.com/tq1/br-tq1-helpers.git#0.0.1",
     "colors": "1.1.2",

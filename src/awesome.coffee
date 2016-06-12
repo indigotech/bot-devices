@@ -11,7 +11,7 @@ module.exports = (async, config) ->
         pretty = ''
         for device in jsonDevice
           if device && device.model && device.version && device.status
-            
+
             if device.status == 'unavailable'
               pretty = pretty + ':red_circle: '
             else
@@ -39,7 +39,7 @@ module.exports = (async, config) ->
         pretty = ''
         for device in jsonDevice
           if device && device.model && device.version && device.status
-            
+
             if device.status == 'unavailable'
               pretty = pretty + ':red_circle: '
             else
@@ -89,7 +89,7 @@ module.exports = (async, config) ->
 
   gotDevice = (id, name, slackCallback) ->
     async.waterfall [
-      (cb) -> 
+      (cb) ->
         getDeviceById id, (error, device) ->
           if error
             slackCallback error
@@ -118,7 +118,7 @@ module.exports = (async, config) ->
 
   updateDevice = (id, field, newValue, slackCallback) ->
     async.waterfall [
-      (cb) -> 
+      (cb) ->
         getDeviceById id, (error, device) ->
           console.log 'id: ' + id
           if error
@@ -175,15 +175,15 @@ module.exports = (async, config) ->
           cb 'error'
         else cb null, text.split(' ')
       (args, cb) ->
-        helpText = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n\nYou can type \`want\` followed by any term of what you want to find (e.g., \*want iPhone\* or \*want iOS\*). \n\nOr, you can just ask for the availability of all devices by typing \`want all\`. When you take a device, \nremember to tell others by typing \`got\` followed by its id. When you return a device, \ntell your bros too: type \`back\` followed by its id.\n\nYou can also register a new device or delete an existing one by typing \`register\` or \`delete\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
+        helpText = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n\nYou can type \`want-device\` followed by any term of what you want to find (e.g., \*want-device iPhone\* or \*want-device iOS\*). \n\nOr, you can just ask for the availability of all devices by typing \`want-device all\`. When you take a device, \nremember to tell others by typing \`got-device\` followed by its id. When you return a device, \ntell your bros too: type \`back-device\` followed by its id.\n\nYou can also register a new device or delete an existing one by typing \`register-device\` or \`delete-device\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register-device \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
 
         action = args[0]
-        if action == 'register'
+        if action == 'register-device'
           createDevice args, cb
           (response, cb) ->
             return cb null, response
 
-        else if action == 'want'
+        else if action == 'want-device'
           platform = args[1]
           if platform == 'all'
             getAllDevices cb
@@ -198,30 +198,30 @@ module.exports = (async, config) ->
             (response, cb) ->
               return cb null, response
 
-        else if action == 'got'
+        else if action == 'got-device'
           id = args[1]
           if id != null
             gotDevice id, user.name, cb
             (response, cb) ->
               return cb null, response
 
-        else if action == 'back'
+        else if action == 'back-device'
           id = args[1]
           if id != null
             returnDevice id, cb
             (response, cb) ->
               return cb null, response
 
-        else if action == 'help'
+        else if action == 'help-device'
          text = helpText
          return cb null, text
 
-        else if action == 'delete'
+        else if action == 'delete-device'
           removeDevice args, cb
           (response, cb) ->
             return cb null, response
 
-        else if action == 'update'
+        else if action == 'update-device'
           id = args[1]
           if id != null
             console.log args
@@ -230,8 +230,7 @@ module.exports = (async, config) ->
               return cb null, response
 
         else
-          text = "Whaaat? \n\n" + helpText
-          return cb null, text
+          return cb null, null
     ], callback
 
   execute: executeCommand
