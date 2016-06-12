@@ -33,4 +33,5 @@ module.exports = (robot) ->
       else if err
         msg.send err
       else
-        msg.send result
+        if result
+          msg.send result
