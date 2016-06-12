@@ -35,6 +35,7 @@ module.exports = (async) ->
     request path, (error, response, body) ->
       console.log devicesEndpoint + '?' + params
       if (!error && response.statusCode == 200 && body)
+        console.log body
         jsonDevice = JSON.parse(body).data
         pretty = ''
         for device in jsonDevice
@@ -175,11 +176,11 @@ module.exports = (async) ->
         if text == null || text == 'undefined' || text == undefined
           console.log text
           cb 'error'
-        else cb null, text.split(' ')
+        else cb null, text.split(' ').shift()
       (args, cb) ->
         helpText = "Yo " + user.name + "! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n\nYou can type \`want-device\` followed by any term of what you want to find (e.g., \*want-device iPhone\* or \*want-device iOS\*). \n\nOr, you can just ask for the availability of all devices by typing \`want-device all\`. When you take a device, \nremember to tell others by typing \`got-device\` followed by its id. When you return a device, \ntell your bros too: type \`back-device\` followed by its id.\n\nYou can also register a new device or delete an existing one by typing \`register-device\` or \`delete-device\`, followed by its full information. Remember, bro, You will need: \*model\*, \*os\*, \*version\*, \*notes\*, \*owner\* (e.g., register-device \"Blackberry Curve\" \"blackberry\" \"7.0.0\" \"Bundle 2055 black\" \"your name\")."
 
-        action = args[1]
+        action = args[0]
         if action == 'register-device'
           createDevice args, cb
           (response, cb) ->
