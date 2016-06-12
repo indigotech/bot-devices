@@ -168,6 +168,8 @@ module.exports = (async) ->
         callback null, "Device was removed"
 
   executeCommand = (text, user, callback) ->
+    console.log text
+    console.log user
     async.waterfall [
       (cb) ->
         if text == null || text == 'undefined' || text == undefined
