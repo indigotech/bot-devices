@@ -98,10 +98,7 @@ module.exports = (async) ->
       else if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
         console.log field
         device[field] = newValue
-      else
-        slackCallback "Oops, not a valid field."
-
-      else
+        
         device.status = 'unavailable'
         device.user = name
         device.date = new Date()
