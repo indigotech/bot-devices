@@ -111,7 +111,7 @@ module.exports = (async) ->
 
         slackCallback null, "It's yours!"
 
-  returnDevice = (id, robot, callback) ->
+  returnDevice = (id, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
       index = devices.indexOf(device)
       if error
