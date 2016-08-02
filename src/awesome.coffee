@@ -156,6 +156,7 @@ module.exports = (async) ->
         args = args.splice(0, 1)
         args = args.join(" ")
         args = args.split(", ")
+        console.log args
         if action == 'device-register'
           createDevice args, robot, cb
           (response, cb) ->
