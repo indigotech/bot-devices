@@ -154,7 +154,9 @@ module.exports = (async) ->
 
         action = args[0]
         args = args.splice(0, 1)
+        console.log args
         args = args.join(" ")
+        console.log args
         args = args.split(", ")
         console.log args
         if action == 'device-register'
