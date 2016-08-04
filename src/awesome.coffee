@@ -3,80 +3,101 @@ module.exports = (async) ->
   devicesArrayKey = "devices"
   request = require('request')
 
+
+  builtOutput = (device, callback) ->
+    status = ""
+    holder = ""
+    ownership = ""
+
+    if device.status == 'unavailable'
+      status = ':red_circle:'
+    else
+      status = ':large_blue_circle:'
+
+    if device.status == 'unavailable'
+      holder = "with #{device.user}"
+
+    if device.owner != 'taqtile'
+      ownership = "owned by _#{device.owner}_"
+
+    # Example output =>
+    #  :red_circle: id: `nexus5xwhite` name: `Nexus 5X 16GB White` version: `6.0.1` owned by _Taqtile_
+    text = "#{status} id: `#{device.id}` name: `#{device.model}` version: `#{device.version}` #{ownership} #{holder}"
+
+    callback null, text
+
+  printDevices = (robot, devices, callback) ->
+
+    output = []
+    devices.forEach (device) ->
+
+      if device and device.model and device.version and device.status and device.id
+        builtOutput device, (err, text) ->
+          output.push(text) if not err
+
+    text = output.join('\n')
+
+    callback null, text
+
   getAllDevices = (robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
-    pretty = ''
-    for device in devices
-      if device and device.model and device.version and device.status and device.id
-        if device.status == 'unavailable'
-          pretty = pretty + ':red_circle: '
-        else
-          pretty = pretty + ':large_blue_circle: '
-        pretty = pretty + device.id + ' ' + device.model + ' ' + device.version
-        if device.status == 'unavailable'
-          pretty = pretty + ' with ' + device.user
-        if device.owner != 'taqtile'
-          pretty = pretty + ' owned by ' + device.owner
-        pretty = pretty + '\n'
 
-
-    callback null, pretty
+    printDevices robot, devices, callback
 
   getDeviceByQ = (query, robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
     pretty = ''
     query = query.toLowerCase()
-    for device in devices
-      if device && device.model && device.version && device.status && device.id
-        if device.model.toLowerCase().indexOf(query) > -1 or device.version.toLowerCase().indexOf(query) > -1 or device.status.toLowerCase().indexOf(query) > -1 or device.os.toLowerCase().indexOf(query) > -1
-          if device.status == 'unavailable'
-            pretty = pretty + ':red_circle: '
-          else
-            pretty = pretty + ':large_blue_circle: '
-          pretty = pretty + device.id + ' ' + device.model + ' ' + device.version
-          if device.status == 'unavailable'
-            pretty = pretty + ' with ' + device.user
-          if device.owner != 'taqtile'
-            pretty = pretty + ' owned by ' + device.owner
-          pretty = pretty + '\n'
-    callback null, pretty
+
+    devices = devices.map (device) ->
+      if device &&
+        device.model &&
+        device.version &&
+        device.status &&
+        device.id &&
+        (device.model.toLowerCase().indexOf(query) > -1 or device.version.toLowerCase().indexOf(query) > -1 or device.status.toLowerCase().indexOf(query) > -1 or device.os.toLowerCase().indexOf(query) > -1)
+          return device
+
+    printDevices robot, devices, callback
+
 
   createDevice = (args, robot, callback) ->
-    params = {}
-    params['id'] = args[1]
-    params['model'] = args[2]
-    params['os'] = args[3]
-    params['version'] = args[4]
-    params['notes'] = args[5]
-    params['owner'] = args[6]
-    params['status'] = 'available'
-    params['date'] = ' '
-    params['user'] = ' '
+    device = {}
+    device.id = args[1]
+    device.model = args[2]
+    device.os = args[3]
+    device.version = args[4]
+    device.notes = args[5]
+    device.owner = args[6]
+    device.status = 'available'
+    device.date = ' '
+    device.user = ' '
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
-    devices.push params
+    devices.push device
     devices = robot.brain.set devicesArrayKey, devices
-    callback null, "Success!"
+    callback null, "Success adding `#{device.id}` (`#{device.model}`)!"
 
   getDeviceById = (id, robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
 
     for device in devices
-      if device.id is id
+      if device.id && id && device.id.toLowerCase() is id.toLowerCase()
         callback null, device, devices
         return
-    return "Device not found"
+    return callback "Device not found for id `#{id}`"
 
 
   gotDevice = (id, name, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      index = devices.indexOf(device)
       if error
-        slackCallback error
-      else if device.status == 'unavailable' && device.user == name
+        return slackCallback error
+
+      index = devices.indexOf(device)
+      if device.status == 'unavailable' && device.user == name
         slackCallback "It's already with you... o.O"
       else if device.status == 'unavailable'
         slackCallback "Oops, someone else has it. Try talking with " + device.user
@@ -88,14 +109,14 @@ module.exports = (async) ->
 
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
-        slackCallback null, "It's yours!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is yours!"
 
   updateDevice = (id, field, newValue, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      index = devices.indexOf(device)
       if error
         slackCallback error
-      else if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
+      index = devices.indexOf(device)
+      if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
         console.log field
         device[field] = newValue
 
@@ -109,7 +130,7 @@ module.exports = (async) ->
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
 
-        slackCallback null, "It's yours!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is yours!"
 
   returnDevice = (id, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
@@ -123,18 +144,18 @@ module.exports = (async) ->
 
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
-        slackCallback null, "It's back!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is back to the pool!"
 
-  removeDevice = (id, robot, callback) ->
+  removeDevice = (id, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      if device
+      if device && devices
         index = devices.indexOf(device)
         if error
           slackCallback error
         else
           devices.splice index, 1
           devices = robot.brain.set devicesArrayKey, devices
-          slackCallback null, "Removed"
+          slackCallback null, "`#{device.id}` (`#{device.model}`) removed"
       else
         slackCallback null, "Error removing"
 
@@ -196,7 +217,7 @@ module.exports = (async) ->
          return cb null, text
 
         else if action == 'device-delete'
-          removeDevice args, robot, cb
+          removeDevice args[1], robot, cb
           (response, cb) ->
             return cb null, response
 
