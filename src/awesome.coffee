@@ -5,12 +5,12 @@ module.exports = (async) ->
 
 
   builtOutput = (device, callback) ->
-    var status = ""
-    var holder = ""
-    var ownership = ""
+    status = ""
+    holder = ""
+    ownership = ""
 
     if device.status == 'unavailable'
-      status = ':red_circle: '
+      status = ':red_circle:'
     else
       status = ':large_blue_circle:'
 
@@ -28,7 +28,8 @@ module.exports = (async) ->
 
   printDevices = (robot, devices, callback) ->
 
-    output = devices.forEach (device) ->
+    output = []
+    devices.forEach (device) ->
 
       if device and device.model and device.version and device.status and device.id
         builtOutput device, (err, text) ->
@@ -63,39 +64,40 @@ module.exports = (async) ->
 
 
   createDevice = (args, robot, callback) ->
-    params = {}
-    params['id'] = args[1]
-    params['model'] = args[2]
-    params['os'] = args[3]
-    params['version'] = args[4]
-    params['notes'] = args[5]
-    params['owner'] = args[6]
-    params['status'] = 'available'
-    params['date'] = ' '
-    params['user'] = ' '
+    device = {}
+    device.id = args[1]
+    device.model = args[2]
+    device.os = args[3]
+    device.version = args[4]
+    device.notes = args[5]
+    device.owner = args[6]
+    device.status = 'available'
+    device.date = ' '
+    device.user = ' '
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
-    devices.push params
+    devices.push device
     devices = robot.brain.set devicesArrayKey, devices
-    callback null, "Success!"
+    callback null, "Success adding `#{device.id}` (`#{device.model}`)!"
 
   getDeviceById = (id, robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
 
     for device in devices
-      if device.id is id
+      if device.id && id && device.id.toLowerCase() is id.toLowerCase()
         callback null, device, devices
         return
-    return "Device not found"
+    return callback "Device not found for id `#{id}`"
 
 
   gotDevice = (id, name, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      index = devices.indexOf(device)
       if error
-        slackCallback error
-      else if device.status == 'unavailable' && device.user == name
+        return slackCallback error
+
+      index = devices.indexOf(device)
+      if device.status == 'unavailable' && device.user == name
         slackCallback "It's already with you... o.O"
       else if device.status == 'unavailable'
         slackCallback "Oops, someone else has it. Try talking with " + device.user
@@ -107,14 +109,14 @@ module.exports = (async) ->
 
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
-        slackCallback null, "It's yours!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is yours!"
 
   updateDevice = (id, field, newValue, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      index = devices.indexOf(device)
       if error
         slackCallback error
-      else if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
+      index = devices.indexOf(device)
+      if (field == 'model' || field == 'os' || field == 'version' || field == 'notes' || field == 'owner')
         console.log field
         device[field] = newValue
 
@@ -128,7 +130,7 @@ module.exports = (async) ->
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
 
-        slackCallback null, "It's yours!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is yours!"
 
   returnDevice = (id, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
@@ -142,18 +144,18 @@ module.exports = (async) ->
 
         devices[index] = device
         devices = robot.brain.set devicesArrayKey, devices
-        slackCallback null, "It's back!"
+        slackCallback null, "`#{device.id}` (`#{device.model}`) is back to the pool!"
 
   removeDevice = (id, robot, callback) ->
     getDeviceById id, robot, (error, device, devices) ->
-      if device
+      if device && devices
         index = devices.indexOf(device)
         if error
           slackCallback error
         else
           devices.splice index, 1
           devices = robot.brain.set devicesArrayKey, devices
-          slackCallback null, "Removed"
+          slackCallback null, "`#{device.id}` (`#{device.model}`) removed"
       else
         slackCallback null, "Error removing"
 
