@@ -125,7 +125,7 @@ module.exports = (async) ->
         devices = robot.brain.set devicesArrayKey, devices
         slackCallback null, "It's back!"
 
-  removeDevice = (id, robot, callback) ->
+  removeDevice = (id, robot, slackCallback) ->
     getDeviceById id, robot, (error, device, devices) ->
       if device
         index = devices.indexOf(device)
@@ -196,7 +196,7 @@ module.exports = (async) ->
          return cb null, text
 
         else if action == 'device-delete'
-          removeDevice args, robot, cb
+          removeDevice args[1], robot, cb
           (response, cb) ->
             return cb null, response
 
