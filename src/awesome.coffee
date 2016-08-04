@@ -3,45 +3,64 @@ module.exports = (async) ->
   devicesArrayKey = "devices"
   request = require('request')
 
+
+  builtOutput = (device, callback) ->
+    var status = ""
+    var holder = ""
+    var ownership = ""
+
+    if device.status == 'unavailable'
+      status = ':red_circle: '
+    else
+      status = ':large_blue_circle:'
+
+    if device.status == 'unavailable'
+      holder = "with #{device.user}"
+
+    if device.owner != 'taqtile'
+      ownership = "owned by _#{device.owner}_"
+
+    # Example output =>
+    #  :red_circle: id: `nexus5xwhite` name: `Nexus 5X 16GB White` version: `6.0.1` owned by _Taqtile_
+    text = "#{status} id: `#{device.id}` name: `#{device.model}` version: `#{device.version}` #{ownership} #{holder}"
+
+    callback null, text
+
+  printDevices = (robot, devices, callback) ->
+
+    output = devices.forEach (device) ->
+
+      if device and device.model and device.version and device.status and device.id
+        builtOutput device, (err, text) ->
+          output.push(text) if not err
+
+    text = output.join('\n')
+
+    callback null, text
+
   getAllDevices = (robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
-    pretty = ''
-    for device in devices
-      if device and device.model and device.version and device.status and device.id
-        if device.status == 'unavailable'
-          pretty = pretty + ':red_circle: '
-        else
-          pretty = pretty + ':large_blue_circle: '
-        pretty = pretty + device.id + ' ' + device.model + ' ' + device.version
-        if device.status == 'unavailable'
-          pretty = pretty + ' with ' + device.user
-        if device.owner != 'taqtile'
-          pretty = pretty + ' owned by ' + device.owner
-        pretty = pretty + '\n'
 
-
-    callback null, pretty
+    printDevices robot, devices, callback
 
   getDeviceByQ = (query, robot, callback) ->
     devices = robot.brain.get devicesArrayKey
     devices = [] if not devices
     pretty = ''
     query = query.toLowerCase()
-    for device in devices
-      if device && device.model && device.version && device.status && device.id
-        if device.model.toLowerCase().indexOf(query) > -1 or device.version.toLowerCase().indexOf(query) > -1 or device.status.toLowerCase().indexOf(query) > -1 or device.os.toLowerCase().indexOf(query) > -1
-          if device.status == 'unavailable'
-            pretty = pretty + ':red_circle: '
-          else
-            pretty = pretty + ':large_blue_circle: '
-          pretty = pretty + device.id + ' ' + device.model + ' ' + device.version
-          if device.status == 'unavailable'
-            pretty = pretty + ' with ' + device.user
-          if device.owner != 'taqtile'
-            pretty = pretty + ' owned by ' + device.owner
-          pretty = pretty + '\n'
-    callback null, pretty
+
+    devices = devices.map (device) ->
+      if device &&
+        device.model &&
+        device.version &&
+        device.status &&
+        device.id &&
+        (device.model.toLowerCase().indexOf(query) > -1 or device.version.toLowerCase().indexOf(query) > -1 or device.status.toLowerCase().indexOf(query) > -1 or device.os.toLowerCase().indexOf(query) > -1)
+          return device
+
+    printDevices robot, devices, callback
+
 
   createDevice = (args, robot, callback) ->
     params = {}
