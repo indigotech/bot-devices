@@ -15,15 +15,10 @@
 # Config helpers
 
 # DEPS
-async   = require('async')
-
-router_module = require('../src/router')
-
+async   = require 'async'
 
 # TQT
-awesome_module = require './awesome'
-awesome = awesome_module async, router_module
-
+awesome = require('./awesome') async
 
 module.exports = (robot) ->
   robot.respond /.*device-.*\b/i, (msg) ->

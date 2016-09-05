@@ -1,7 +1,6 @@
 module.exports = (async) ->
 
   devicesArrayKey = "devices"
-  request = require('request')
 
 
   builtOutput = (device, callback) ->
