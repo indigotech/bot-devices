@@ -15,7 +15,7 @@ module.exports = (deviceResource, messages) ->
       device.date = ''
 
       deviceResource.update robot, index, device
-      callback null, messages.SUCCESS_RETURN_DEVICE
+      callback null, messages.SUCCESS_RETURN_DEVICE device
 
   parseArgs = (args) ->
     args[1]
