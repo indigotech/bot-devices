@@ -20,7 +20,9 @@ async   = require 'async'
 # Awesome bot
 utils = require './utils'
 deviceResource = require('./device.resource') utils
-awesome = require('./awesome') deviceResource, async
+messages = require './messages'
+
+awesome = require('./awesome') async, deviceResource, messages
 
 module.exports = (robot) ->
   robot.respond /.*device-.*\b/i, (msg) ->
