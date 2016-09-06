@@ -1,6 +1,6 @@
 module.exports = (messages) ->
 
-  displayHelp = (user, robot, callback) ->
+  displayHelp = (user, callback) ->
     helpText = [
       "Yo #{user.name}! How r u doin, bro? Im here to help you find and manage devices. For example, an iPhone 6 Plus iOS 9.2 64 GB White. \n",
       "You can type \`device-want\` followed by any term of what you want to find (e.g., \*device-want iPhone\* or \*device-want iOS\*). \n",
