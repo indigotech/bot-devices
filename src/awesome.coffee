@@ -18,10 +18,6 @@ module.exports = (deviceResource, async) ->
     output = devices.map (device) -> builtOutput device
     callback null, output.join '\n'
 
-  getAllDevices = (robot, callback) ->
-    devices = deviceResource.getAll robot
-    printDevices devices, callback
-
   getDeviceByQ = (query, robot, callback) ->
     devices = deviceResource.getByQ robot, query
     printDevices devices, callback
@@ -128,12 +124,12 @@ module.exports = (deviceResource, async) ->
         else if action == 'device-want'
           platform = args[1]
           if platform == 'all'
-            getAllDevices robot, cb
+            getDeviceByQ undefined, robot, cb
 
           if platform != null && platform != 'undefined' && platform != undefined
             getDeviceByQ platform, robot, cb
           else
-            getAllDevices robot, cb
+            getDeviceByQ undefined, robot, cb
 
         else if action == 'device-got'
           id = args[1]

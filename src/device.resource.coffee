@@ -9,20 +9,24 @@ module.exports = (utils) ->
     devices.filter (device) -> device?
 
   getByQ = (robot, query) ->
-    query = query.toLower()
     devices = getAll robot
-    devices = devices.filter (device) ->
-      utils.strContains(device.model, query) ||
-      utils.strContains(device.version, query) ||
-      utils.strContains(device.id, query) ||
-      utils.strContains(device.status, query)
+
+    if query && query.length > 0
+      query = query.toLower()
+      devices.filter (device) ->
+        utils.strContains(device.model, query) ||
+        utils.strContains(device.version, query) ||
+        utils.strContains(device.id, query) ||
+        utils.strContains(device.status, query)
+    else
+      devices
 
   getById = (robot, id) ->
     id = id.toLower()
     devices = getAll robot
     devices = devices.filter (device) -> utils.strContains(device.id, id)
 
-    return devices[0]
+    devices[0]
 
   saveAll = (robot, devices) ->
     robot.brain.set devicesArrayKey, devices
@@ -43,7 +47,7 @@ module.exports = (utils) ->
     devices.push device
     saveAll robot, devices
 
-    return device
+    device
 
   update = (robot, index, device) ->
     devices = getAll robot
@@ -52,7 +56,6 @@ module.exports = (utils) ->
     if index > -1
       # probably a useless line of code
       devices[index] = device
-
       saveAll robot, devices
 
   remove = (robot, device) ->
