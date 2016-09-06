@@ -17,8 +17,10 @@
 # DEPS
 async   = require 'async'
 
-# TQT
-awesome = require('./awesome') async
+# Awesome bot
+utils = require './utils'
+deviceResource = require('./device.resource') utils
+awesome = require('./awesome') deviceResource, async
 
 module.exports = (robot) ->
   robot.respond /.*device-.*\b/i, (msg) ->
