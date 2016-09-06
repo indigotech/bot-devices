@@ -11,7 +11,7 @@ module.exports = (deviceResource, messages) ->
   parseArgs = (args) ->
     query = args[1]
 
-    if query == 'all' || (query != null && query != 'undefined' && query != undefined)
+    if query is 'all'
       undefined
     else
       query

@@ -8,7 +8,7 @@ module.exports = (deviceResource, messages) ->
 
     else
       if device.status is 'unavailable' && device.user == name
-        callback messages.ERROR_DEVICE_OWNED
+        callback messages.ERROR_DEVICE_OWNED device
       else if device.status is 'unavailable'
         callback messages.ERROR_DEVICE_UNAVAILABLE device
       else

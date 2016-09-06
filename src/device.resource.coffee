@@ -1,4 +1,4 @@
-module.exports = (utils) ->
+module.exports = (_) ->
 
   devicesArrayKey = "devices"
 
@@ -11,20 +11,20 @@ module.exports = (utils) ->
   getByQ = (robot, query) ->
     devices = getAll robot
 
-    if query && query.length > 0
+    if _.get(query, 'length', 0) > 0
       query = query.toLowerCase()
       devices.filter (device) ->
-        utils.strContains(device.model, query) ||
-        utils.strContains(device.version, query) ||
-        utils.strContains(device.id, query) ||
-        utils.strContains(device.status, query)
+        _.includes(device.id?.toLowerCase(), query) or
+        _.includes(device.model?.toLowerCase(), query) or
+        _.includes(device.os?.toLowerCase(), query) or
+        _.includes(device.version?.toLowerCase(), query) or
+        _.includes(device.status?.toLowerCase(), query)
     else
       devices
 
   getById = (robot, id) ->
-    id = id.toLowerCase()
     devices = getAll robot
-    devices = devices.filter (device) -> utils.strContains(device.id, id)
+    devices = devices.filter (device) -> _.includes(device.id?.toLowerCase(), id?.toLowerCase())
 
     devices[0]
 

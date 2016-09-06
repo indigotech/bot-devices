@@ -18,8 +18,8 @@
 async   = require 'async'
 
 # Awesome bot
-utils = require './utils'
-deviceResource = require('./device.resource') utils
+_ = require 'lodash'
+deviceResource = require('./device.resource') _
 messages = require './messages'
 
 awesome = require('./awesome') async, deviceResource, messages
