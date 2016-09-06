@@ -3,11 +3,10 @@ module.exports = (deviceResource, messages) ->
   removeDevice = (robot, callback) ->
     devices = deviceResource.getAll robot
 
-    devices = devices.filter (device) ->
-      not device.id or device.id.length == 0
+    devices = devices.filter (device) -> not device.id or device.id.length == 0
 
     if devices.length > 0
-      deviceResource.remove robot, device
+      deviceResource.remove robot, devices[0]
 
     callback null, messages.SUCCESS_REMOVE_INVALID_DEVICE device
 
