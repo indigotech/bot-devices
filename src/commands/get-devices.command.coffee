@@ -16,7 +16,7 @@ module.exports = (deviceResource, messages) ->
     else
       query
 
-  execute = (args, robot, callback,) ->
+  execute = (args, user, robot, callback) ->
     query = parseArgs args
     getDeviceByQ query, robot, callback
 

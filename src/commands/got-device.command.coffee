@@ -7,9 +7,9 @@ module.exports = (deviceResource, messages) ->
       callback messages.ERROR_GET_DEVICE id
 
     else
-      if device.status == 'unavailable' && device.user == name
+      if device.status is 'unavailable' && device.user == name
         callback messages.ERROR_DEVICE_OWNED
-      else if device.status == 'unavailable'
+      else if device.status is 'unavailable'
         callback messages.ERROR_DEVICE_UNAVAILABLE device
       else
         devices = deviceResource.getAll robot
@@ -25,8 +25,8 @@ module.exports = (deviceResource, messages) ->
   parseArgs = (args) ->
     args[1]
 
-  execute = (args, robot, callback) ->
+  execute = (args, user, robot, callback) ->
     id = parseArgs args
-    gotDevice id, robot, callback
+    gotDevice id, user.name, robot, callback
 
   execute: execute

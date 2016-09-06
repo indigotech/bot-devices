@@ -20,7 +20,7 @@ module.exports = (deviceResource, messages) ->
   parseArgs = (args) ->
     args[1]
 
-  execute = (args, robot, callback) ->
+  execute = (args, user, robot, callback) ->
     id = parseArgs args
     returnDevice id, robot, callback
 

@@ -12,7 +12,7 @@ module.exports = (messages) ->
 
     callback null, helpText
 
-  execute = (user, callback) ->
+  execute = (args, user, robot, callback) ->
     displayHelp user, callback
 
   execute: execute

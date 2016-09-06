@@ -21,7 +21,7 @@ module.exports = (deviceResource, messages) ->
     field: args[2]
     newValue: args[3]
 
-  execute = (args, robot, callback) ->
+  execute = (args, user, robot, callback) ->
     params = parseArgs args
     gotDevice params.id, params.field, params.newValue, robot, callback
 

@@ -30,12 +30,10 @@ module.exports = (async, deviceResource, messages) ->
 
         command = commands[action]
 
-        if action == "device-help" || not command
+        if not command
           command = commands["device-help"]
-          command.execute user, cb
 
-        else
-          command.execute args, robot, cb
+        command.execute args, user, robot, cb
 
     ], callback
 

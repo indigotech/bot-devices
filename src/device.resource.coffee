@@ -12,7 +12,7 @@ module.exports = (utils) ->
     devices = getAll robot
 
     if query && query.length > 0
-      query = query.toLower()
+      query = query.toLowerCase()
       devices.filter (device) ->
         utils.strContains(device.model, query) ||
         utils.strContains(device.version, query) ||
@@ -22,7 +22,7 @@ module.exports = (utils) ->
       devices
 
   getById = (robot, id) ->
-    id = id.toLower()
+    id = id.toLowerCase()
     devices = getAll robot
     devices = devices.filter (device) -> utils.strContains(device.id, id)
 

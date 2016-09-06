@@ -12,7 +12,7 @@ module.exports = (deviceResource, messages) ->
     notes: args[5]
     owner: args[6]
 
-  execute = (args, robot, callback) ->
+  execute = (args, user, robot, callback) ->
     params = parseArgs args
     createDevice params, robot, callback
 
