@@ -28,3 +28,5 @@ module.exports =
   SUCCESS_RETURN_DEVICE: (device) -> "`#{device.id}` (`#{device.model}`) is back to the pool!"
 
   SUCCESS_REMOVE_DEVICE: (device) -> "`#{device.id}` (`#{device.model}`) removed"
+
+  SUCCESS_REMOVE_INVALID_DEVICE: (device) -> "Invalid device (`#{device.model}`) removed"

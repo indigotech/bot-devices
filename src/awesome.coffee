@@ -9,6 +9,7 @@ module.exports = (async, deviceResource, messages) ->
     "device-delete": require('./commands/remove-device.command') deviceResource, messages
     "device-back": require('./commands/return-device.command') deviceResource, messages
     "device-update": require('./commands/update-device.command') deviceResource, messages
+    "device-prune": require('./commands/remove-invalid-device.command') deviceResource, messages
 
   executeCommand = (msg, robot, callback) ->
     text = msg.message.text
