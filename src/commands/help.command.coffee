@@ -13,7 +13,7 @@ module.exports = (messages) ->
 
     callback null, helpText
 
-  execute = (args, user, robot, callback) ->
+  execute = (args, user, brain, callback) ->
     displayHelp user, callback
 
   execute: execute

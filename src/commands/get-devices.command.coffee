@@ -4,8 +4,8 @@ module.exports = (deviceResource, messages) ->
     output = devices.map (device) -> messages.DEVICE_STATUS device
     callback null, output.join '\n'
 
-  getDeviceByQ = (query, robot, callback) ->
-    devices = deviceResource.getByQ robot, query
+  getDeviceByQ = (query, brain, callback) ->
+    devices = deviceResource.getByQ brain, query
     printDevices devices, callback
 
   parseArgs = (args) ->
@@ -16,8 +16,8 @@ module.exports = (deviceResource, messages) ->
     else
       query
 
-  execute = (args, user, robot, callback) ->
+  execute = (args, user, brain, callback) ->
     query = parseArgs args
-    getDeviceByQ query, robot, callback
+    getDeviceByQ query, brain, callback
 
   execute: execute

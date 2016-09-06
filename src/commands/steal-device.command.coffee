@@ -1,7 +1,7 @@
 module.exports = (deviceResource, messages) ->
 
-  gotDevice = (id, name, robot, callback) ->
-    device = deviceResource.getById robot, id
+  gotDevice = (id, name, brain, callback) ->
+    device = deviceResource.getById brain, id
 
     if not device
       callback messages.ERROR_GET_DEVICE id
@@ -10,7 +10,7 @@ module.exports = (deviceResource, messages) ->
       if device.status is 'unavailable' && device.user == name
         callback messages.ERROR_DEVICE_OWNED device
       else
-        devices = deviceResource.getAll robot
+        devices = deviceResource.getAll brain
         index = devices.indexOf(device)
 
         oldUser = device.user
@@ -19,14 +19,14 @@ module.exports = (deviceResource, messages) ->
         device.user = name
         device.date = new Date()
 
-        deviceResource.update robot, index, device
+        deviceResource.update brain, index, device
         callback null, messages.SUCCESS_GOT_DEVICE device, oldUser
 
   parseArgs = (args) ->
     args[1]
 
-  execute = (args, user, robot, callback) ->
+  execute = (args, user, brain, callback) ->
     id = parseArgs args
-    gotDevice id, user.name, robot, callback
+    gotDevice id, user.name, brain, callback
 
   execute: execute

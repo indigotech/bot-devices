@@ -35,7 +35,7 @@ module.exports = (async, deviceResource, messages) ->
         if not command
           command = commands["device-help"]
 
-        command.execute args, user, robot, cb
+        command.execute args, user, robot.brain, cb
 
     ], callback
 
