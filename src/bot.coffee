@@ -15,15 +15,14 @@
 # Config helpers
 
 # DEPS
-async   = require('async')
+async   = require 'async'
 
-router_module = require('../src/router')
+# Awesome bot
+_ = require 'lodash'
+deviceResource = require('./device.resource') _
+messages = require './messages'
 
-
-# TQT
-awesome_module = require './awesome'
-awesome = awesome_module async, router_module
-
+awesome = require('./awesome') async, deviceResource, messages
 
 module.exports = (robot) ->
   robot.respond /.*device-.*\b/i, (msg) ->
