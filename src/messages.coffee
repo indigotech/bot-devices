@@ -34,3 +34,14 @@ module.exports =
   SUCCESS_NO_INVALID_DEVICE: "No invalid device"
 
   SUCCESS_STEAL_DEVICE: (device, oldUser) -> "Sticky fingers! You've stolen `#{device.id}` (`#{device.model}`) from #{oldUser}! :parrot:"
+
+  SUCCESS_NO_DEVICES_FORGOTTEN: "Congrats!!! U've returned all devices! But should see a doctor... your head is not as it used to be"
+  SUCCESS_HAS_DEVICES_FORGOTTEN: "Hey buddy! U owe me devices!"
+  DEVICE_FORGOTTEN: (device) ->
+    output = []
+
+    output.push "id: `#{device.id}`"
+    output.push "name: `#{device.model}`"
+    output.push "version: `#{device.version}`"
+
+    output.join ' '
