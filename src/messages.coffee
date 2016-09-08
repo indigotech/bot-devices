@@ -26,6 +26,7 @@ module.exports =
   SUCCESS_DEVICE_UPDATE: (device, field, newValue) -> "`#{device.id}` (`#{field}: #{newValue}`) updated!"
 
   SUCCESS_RETURN_DEVICE: (device) -> "`#{device.id}` (`#{device.model}`) is back to the pool!"
+  SUCCESS_RETURN_ALL_DEVICE: "All devices you had are back to the pool!"
 
   SUCCESS_REMOVE_DEVICE: (device) -> "`#{device.id}` (`#{device.model}`) removed"
 
