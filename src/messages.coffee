@@ -31,3 +31,5 @@ module.exports =
 
   SUCCESS_REMOVE_INVALID_DEVICE: (device) -> "Invalid device (`#{device.model}`) removed"
   SUCCESS_NO_INVALID_DEVICE: "No invalid device"
+
+  SUCCESS_STEAL_DEVICE: (device, oldUser) -> "Sticky fingers! You've stolen `#{device.id}` (`#{device.model}`) from #{oldUser}! :parrot:"

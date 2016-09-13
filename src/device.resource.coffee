@@ -2,14 +2,14 @@ module.exports = (_) ->
 
   devicesArrayKey = "devices"
 
-  getAll = (robot) ->
-    devices = robot.brain.get devicesArrayKey
+  getAll = (brain) ->
+    devices = brain.get devicesArrayKey
     devices = [] if not devices
 
     devices.filter (device) -> device?
 
-  getByQ = (robot, query) ->
-    devices = getAll robot
+  getByQ = (brain, query) ->
+    devices = getAll brain
 
     if _.get(query, 'length', 0) > 0
       query = query.toLowerCase()
@@ -22,16 +22,16 @@ module.exports = (_) ->
     else
       devices
 
-  getById = (robot, id) ->
-    devices = getAll robot
+  getById = (brain, id) ->
+    devices = getAll brain
     devices = devices.filter (device) -> _.includes(device.id?.toLowerCase(), id?.toLowerCase())
 
     devices[0]
 
-  saveAll = (robot, devices) ->
-    robot.brain.set devicesArrayKey, devices
+  saveAll = (brain, devices) ->
+    brain.set devicesArrayKey, devices
 
-  create = (robot, params) ->
+  create = (brain, params) ->
     device =
       id: params.id
       model: params.model
@@ -43,29 +43,29 @@ module.exports = (_) ->
       date: ' '
       user: ' '
 
-    devices = getAll robot
+    devices = getAll brain
     devices.push device
-    saveAll robot, devices
+    saveAll brain, devices
 
     device
 
-  update = (robot, index, device) ->
-    devices = getAll robot
+  update = (brain, index, device) ->
+    devices = getAll brain
 
     # TODO what happens if device is not found? is it possible
     if index > -1
       # probably a useless line of code
       devices[index] = device
-      saveAll robot, devices
+      saveAll brain, devices
 
-  remove = (robot, device) ->
-    devices = getAll robot
+  remove = (brain, device) ->
+    devices = getAll brain
     index = devices.indexOf device
 
     # TODO what happens if device is not found? is it possible
     if index > -1
       devices.splice index, 1
-      saveAll robot, devices
+      saveAll brain, devices
 
   getAll: getAll
   getByQ: getByQ

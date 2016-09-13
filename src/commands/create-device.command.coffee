@@ -1,7 +1,7 @@
 module.exports = (deviceResource, messages) ->
 
-  createDevice = (params, robot, callback) ->
-    device = deviceResource.create robot, params
+  createDevice = (params, brain, callback) ->
+    device = deviceResource.create brain, params
     callback null, messages.SUCCESS_CREATE_DEVICE device
 
   parseArgs = (args) ->
@@ -12,8 +12,8 @@ module.exports = (deviceResource, messages) ->
     notes: args[5]
     owner: args[6]
 
-  execute = (args, user, robot, callback) ->
+  execute = (args, user, brain, callback) ->
     params = parseArgs args
-    createDevice params, robot, callback
+    createDevice params, brain, callback
 
   execute: execute

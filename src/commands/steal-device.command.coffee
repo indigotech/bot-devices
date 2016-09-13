@@ -9,18 +9,18 @@ module.exports = (deviceResource, messages) ->
     else
       if device.status is 'unavailable' && device.user == name
         callback messages.ERROR_DEVICE_OWNED device
-      else if device.status is 'unavailable'
-        callback messages.ERROR_DEVICE_UNAVAILABLE device
       else
         devices = deviceResource.getAll brain
         index = devices.indexOf(device)
+
+        oldUser = device.user
 
         device.status = 'unavailable'
         device.user = name
         device.date = new Date()
 
         deviceResource.update brain, index, device
-        callback null, messages.SUCCESS_GOT_DEVICE device
+        callback null, messages.SUCCESS_GOT_DEVICE device, oldUser
 
   parseArgs = (args) ->
     args[1]
