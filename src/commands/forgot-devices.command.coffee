@@ -1,6 +1,6 @@
 module.exports = (deviceResource, messages) ->
 
-  forgotDevices = (brain, callback) ->
+  forgotDevices = (brain, user, callback) ->
     devices = deviceResource.getAll brain
 
     devices = devices.filter (device) -> device.user is user.name
@@ -14,6 +14,6 @@ module.exports = (deviceResource, messages) ->
       callback null, output.join '\n'
 
   execute = (args, user, brain, callback) ->
-    forgotDevices brain, callback
+    forgotDevices brain, user, callback
 
   execute: execute

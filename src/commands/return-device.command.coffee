@@ -10,7 +10,7 @@ module.exports = (deviceResource, messages) ->
         device.date = ''
         deviceResource.update brain, index, device
 
-    callback null, messages.SUCCESS_RETURNING_ALL_DEVICES
+    callback null, messages.SUCCESS_RETURN_ALL_DEVICES
 
   returnDevice = (id, brain, callback) ->
     device = deviceResource.getById brain, id
