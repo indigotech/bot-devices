@@ -1,5 +1,17 @@
 module.exports = (deviceResource, messages) ->
 
+  returnAll = (user, brain, callback) ->
+    devices = deviceResource.getAll brain
+
+    devices.forEach (device, index) ->
+      if device.user is user.name
+        device.status = 'available'
+        device.user = ''
+        device.date = ''
+        deviceResource.update brain, index, device
+
+    callback null, messages.SUCCESS_RETURNING_ALL_DEVICES
+
   returnDevice = (id, brain, callback) ->
     device = deviceResource.getById brain, id
 
@@ -22,6 +34,10 @@ module.exports = (deviceResource, messages) ->
 
   execute = (args, user, brain, callback) ->
     id = parseArgs args
-    returnDevice id, brain, callback
+
+    if id is "all"
+      returnAll user, brain, callback
+    else
+      returnDevice id, brain, callback
 
   execute: execute
